@@ -1,0 +1,141 @@
+/* General Styles */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #121212;
+    color: #fff;
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.chat-app {
+    width: 100%;
+    max-width: 500px;
+    height: 90vh;
+    display: flex;
+    flex-direction: column;
+    border-radius: 10px;
+    overflow: hidden;
+    background-color: #1f1f1f;
+}
+
+header {
+    background-color: #202020;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.chat-container {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    scroll-behavior: smooth;  /* Smooth scrolling */
+}
+
+.message {
+    display: flex;
+    margin-bottom: 15px;  /* Adjusted spacing */
+    padding: 5px 0;
+}
+
+.message.user .bubble {
+    background-color: #007bff;
+    color: white;
+    align-self: flex-start;
+}
+
+.message.assistant .bubble {
+    background-color: #444;
+    color: white;
+    align-self: flex-end;
+}
+
+.bubble {
+    padding: 10px 15px;
+    border-radius: 8px;
+    color: #fff;
+    max-width: 80%;  /* Adjusted from 70% */
+}
+
+/* Code block styling */
+pre {
+    background-color: #2c2c2c;
+    padding: 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #fff;
+    margin-top: 10px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+code {
+    font-family: 'Courier New', monospace;
+}
+
+form {
+    display: flex;
+    padding: 10px;
+    background-color: #202020;
+}
+
+textarea {
+    flex: 1;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    resize: none;
+    color: #fff;
+    background-color: #2c2c2c;
+}
+
+textarea:focus {
+    outline: none;
+    border: 2px solid #007bff;
+    background-color: #333;
+}
+
+button.send-btn {
+    background-color: #007bff;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button.send-btn:hover {
+    background-color: #0056b3;
+}
+
+/* Custom Scrollbar */
+.chat-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.chat-container::-webkit-scrollbar-thumb {
+    background-color: #444;
+    border-radius: 4px;
+}
+
+.chat-container::-webkit-scrollbar-track {
+    background: #333;
+}
+
+/* Clear Button */
+.clear-btn {
+    background-color: #ff4c4c;
+    color: white;
+    padding: 5px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.clear-btn:hover {
+    background-color: #e03e3e;
+}

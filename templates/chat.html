@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Qwen Coder Chat</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="chat-app">
+        <header>
+            <h1>Qwen Coder</h1>
+            <button id="clear-chat" class="clear-btn">Clear Chat</button>
+        </header>
+
+        <main class="chat-container" id="chat-container">
+            {% for message in history %}
+                <div class="message {{ message.role }}">
+                    <div class="bubble">
+                        {% if message.role == 'assistant' %}
+                            {% if '```' in message.message %}
+                                <pre><code>{{ message.message | e }}</code></pre>
+                            {% else %}
+                                {{ message.message | e }}
+                            {% endif %}
+                        {% else %}
+                            {{ message.message | e }}
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </main>
+
+        <form id="chat-form">
+            <textarea id="prompt" placeholder="Type your message..."></textarea>
+            <button type="submit" class="send-btn">Send</button>
+        </form>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
