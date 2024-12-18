@@ -84,7 +84,3 @@ def clear_history():
 
 if __name__ == '__main__':
     app.run(debug=True)
-
-
-print("SECRET_KEY:", os.getenv('SECRET_KEY'))
-print("HUGGINGFACE_API_TOKEN:", os.getenv('HUGGINGFACE_API_TOKEN'))
