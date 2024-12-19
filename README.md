@@ -1,4 +1,4 @@
-# QwenCoderApp
+# QwenCoderApp - (WIP)
 
 QwenCoderApp is a web-based chat application that allows users to interact with an AI assistant powered by the HuggingFace API. Built with Flask for the backend and vanilla JavaScript for the frontend, the app offers an interactive chat interface, typing indicators, session management, and more.
 
