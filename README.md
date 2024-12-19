@@ -1,36 +1,66 @@
-# First-AI-Application-using-Qwen-model
+# QwenCoderApp
 
-## Overview
-This repository contains a Flask web application that interacts with the Hugging Face API to generate AI responses using the Qwen model. The app provides a chat interface where users can input prompts and receive AI-generated responses.
+QwenCoderApp is a web-based chat application that allows users to interact with an AI assistant powered by the HuggingFace API. Built with Flask for the backend and vanilla JavaScript for the frontend, the app offers an interactive chat interface, typing indicators, session management, and more.
 
-## Key Features
-- **Chat Interface**: A web-based chat interface for users to interact with the AI model.
-- **Session Management**: Maintains a history of user and AI interactions within a session.
-- **API Integration**: Connects to the Hugging Face API to generate responses using the Qwen model.
-- **Environment Configuration**: Utilizes environment variables for configuration, ensuring sensitive information like API tokens are not hardcoded.
+## Features
 
-## Key Files
-- **README.md**
-  - Provides an overview of the project, its features, and setup instructions.
-  
-- **app.py**
-  - Main application file for the Flask web application. Includes:
-    - **Initialization**: Loads environment variables and initializes the Flask app.
-    - **Routes**:
-      - `/`: Renders the chat UI and loads chat history from the session.
-      - `/get_response`: Handles chat form submission and retrieves a response from the Hugging Face API.
-      - `/clear`: Clears the chat history.
-    - **AI Interaction**: Constructs prompts, sends them to the Hugging Face API, and processes the responses.
-    - **Session Management**: Maintains chat history within the session and ensures it does not exceed a specified length.
+- **Interactive Chat Interface**: Users can type messages and receive AI-generated responses.
+- **Typing Indicator**: Displays when the AI assistant is typing.
+- **Clear Chat History**: Easily clear the chat history.
+- **Session Management**: Retains chat history across page reloads.
+- **Complete Response Handling**: Ensures long AI responses are complete.
 
-- **.env**
-  - Contains environment variables such as `SECRET_KEY` and `HUGGINGFACE_API_TOKEN`. Ensures sensitive information is not hardcoded in the codebase.
+## Installation
 
-## Version and Model Information
-- **Flask Version**: The application uses Flask, a lightweight WSGI web application framework.
-- **Model**: The application uses the Qwen2.5-Coder-32B-Instruct model from Hugging Face.
+1. Clone the repository:
+    ```sh
+    git clone <repository-url>
+    cd QwenCoderApp
+    ```
 
-## Recommendations
-- **Update README.md**: Provide detailed documentation on the project, including setup instructions, usage examples, and any dependencies required.
-- **Error Handling**: Ensure robust error handling in `app.py` to manage cases where the API might not respond as expected.
-- **Environment Variables**: Safeguard your `.env` file and ensure it contains all necessary environment variables for the application to function correctly.
+2. Create and activate a virtual environment:
+    ```sh
+    python -m venv venv
+    source venv/bin/activate  # On Windows use `venv\Scripts\activate`
+    ```
+
+3. Install the required dependencies:
+    ```sh
+    pip install -r requirements.txt
+    ```
+
+4. Create a `.env` file with your HuggingFace API token:
+    ```properties
+    SECRET_KEY=your_secret_key
+    HUGGINGFACE_API_TOKEN=your_huggingface_api_token
+    ```
+
+## Usage
+
+1. Run the Flask application:
+    ```sh
+    flask run
+    ```
+
+2. Open your web browser and navigate to `http://127.0.0.1:5000`.
+
+3. Start interacting with the AI assistant via the chat interface.
+
+## Project Structure
+
+QwenCoderApp/
+├── static/
+│ ├── css/
+│ │ └── style.css
+│ └── js/
+│ └── script.js
+├── templates/
+│ ├── chat.html
+│ └── error.html
+├── .env
+├── app.py
+├── app.log
+├── requirements.txt
+└── README.md## Contributing
+
+
