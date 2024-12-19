@@ -48,21 +48,6 @@ QwenCoderApp is a web-based chat application that allows users to interact with 
 
 ## Project Structure
 
-\```
-QwenCoderApp/
-├── static/
-│   ├── css/
-│   │   └── style.css
-│   └── js/
-│       └── script.js
-├── templates/
-│   ├── chat.html
-│   └── error.html
-├── .env
-├── app.py
-├── app.log
-├── requirements.txt
-└── README.md
-\```
+<p>QwenCoderApp/<br>├── static/<br>│   ├── css/<br>│   │   └── style.css<br>│   └── js/<br>│       └── script.js<br>├── templates/<br>│   ├── chat.html<br>│   └── error.html<br>├── .env<br>├── app.py<br>├── app.log<br>├── requirements.txt<br>└── README.md</p>
 
 
