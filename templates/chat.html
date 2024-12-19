@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -8,9 +8,12 @@
 </head>
 <body>
     <div class="chat-app">
-        <header>
+        <header class="chat-header">
             <h1>Qwen Coder</h1>
-            <button id="clear-chat" class="clear-btn">Clear Chat</button>
+            <div class="header-buttons">
+                <button id="clear-chat" class="clear-btn">🧹 Clear Chat</button>
+                <button id="stop-chat" class="stop-btn hidden">🛑 Stop</button>
+            </div>
         </header>
 
         <main class="chat-container" id="chat-container">
@@ -32,11 +35,118 @@
         </main>
 
         <form id="chat-form">
-            <textarea id="prompt" placeholder="Type your message..."></textarea>
+            <textarea id="prompt" placeholder="Type your message..." required></textarea>
             <button type="submit" class="send-btn">Send</button>
         </form>
     </div>
 
-    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script>
+        let eventSource;
+
+        const chatForm = document.getElementById('chat-form');
+        const chatContainer = document.getElementById('chat-container');
+        const clearChatButton = document.getElementById('clear-chat');
+        const stopChatButton = document.getElementById('stop-chat');
+        const promptInput = document.getElementById('prompt');
+
+        chatForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const prompt = promptInput.value.trim();
+            if (!prompt) return;
+            
+            // Display user's message
+            addMessage('user', prompt);
+            
+            // Disable form while AI is generating a response
+            disableForm();
+
+            // Show Stop button
+            stopChatButton.classList.remove('hidden');
+
+            // Create an EventSource for live streaming
+            eventSource = new EventSource(`/get_response?prompt=${encodeURIComponent(prompt)}`);
+            
+            let assistantResponse = '';
+            
+            eventSource.onmessage = function(event) {
+                assistantResponse += event.data;
+                updateAssistantMessage(assistantResponse);
+                autoScroll();
+            };
+
+            eventSource.onerror = function() {
+                console.log('Stream closed');
+                eventSource.close();
+                enableForm();
+                stopChatButton.classList.add('hidden');
+            };
+
+            eventSource.onopen = function() {
+                console.log('Streaming started...');
+            };
+
+            promptInput.value = '';
+        });
+
+        stopChatButton.addEventListener('click', () => {
+            if (eventSource) {
+                eventSource.close();
+                stopChatButton.classList.add('hidden');
+                enableForm();
+            }
+        });
+
+        clearChatButton.addEventListener('click', async () => {
+            const response = await fetch('/clear', { method: 'POST' });
+            if (response.ok) {
+                chatContainer.innerHTML = '';
+            }
+        });
+
+        function addMessage(role, message) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message', role);
+            messageElement.innerHTML = `
+                <div class="bubble">${message}</div>
+            `;
+            chatContainer.appendChild(messageElement);
+            autoScroll();
+        }
+
+        function updateAssistantMessage(message) {
+            let assistantMessageElement = document.getElementById('assistant-message');
+
+            if (!assistantMessageElement) {
+                assistantMessageElement = document.createElement('div');
+                assistantMessageElement.classList.add('message', 'assistant');
+                assistantMessageElement.id = 'assistant-message';
+                assistantMessageElement.innerHTML = `<div class="bubble">${message}</div>`;
+                chatContainer.appendChild(assistantMessageElement);
+            } else {
+                assistantMessageElement.querySelector('.bubble').textContent = message;
+            }
+
+            autoScroll();
+        }
+
+        function autoScroll() {
+            chatContainer.scrollTo({
+                top: chatContainer.scrollHeight,
+                behavior: 'smooth'
+            });
+        }
+
+        function disableForm() {
+            promptInput.disabled = true;
+            chatForm.querySelector('button').disabled = true;
+        }
+
+        function enableForm() {
+            promptInput.disabled = false;
+            chatForm.querySelector('button').disabled = false;
+        }
+    </script>
+
 </body>
 </html>

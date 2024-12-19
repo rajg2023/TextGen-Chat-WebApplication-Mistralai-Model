@@ -1,8 +1,10 @@
 import os
 import secrets
 from dotenv import load_dotenv
-from flask import Flask, request, render_template, session, jsonify
+from flask import Flask, request, render_template, session, jsonify, Response
 import requests
+import logging
+import time
 
 # Load environment variables from .env
 load_dotenv()
@@ -22,6 +24,9 @@ HEADERS = {
     'Content-Type': 'application/json'
 }
 
+# Configure logging
+logging.basicConfig(level=logging.DEBUG)
+
 @app.route('/')
 def index():
     """Render the chat UI and load chat history from the session."""
@@ -29,58 +34,105 @@ def index():
         session['history'] = []
     return render_template('chat.html', history=session['history'])
 
-@app.route('/get_response', methods=['POST'])
+@app.route('/get_response', methods=['GET', 'POST'])  # Allow both GET and POST requests
 def get_response():
-    """Handle chat form submission and get a response from the HuggingFace API."""
-    user_input = request.form.get('prompt', '').strip()
-    if not user_input:
-        return jsonify({'error': 'Prompt cannot be empty'}), 400
+    """Handle both GET and POST requests."""
+    if request.method == 'POST':
+        user_input = request.form.get('prompt', '').strip()
+        if not user_input:
+            logging.warning("Empty prompt received")
+            return jsonify({'error': 'Prompt cannot be empty'}), 400
+    elif request.method == 'GET':
+        user_input = request.args.get('prompt', '').strip()  # Fetch prompt from query string
+        if not user_input:
+            logging.warning("Empty prompt received in GET")
+            return jsonify({'error': 'Prompt cannot be empty'}), 400
 
-    # Ensure 'history' exists in the session
     if 'history' not in session:
         session['history'] = []
 
-    # Add user message to the session history
     session['history'].append({'role': 'user', 'message': user_input})
 
-    # Prepare the request data for the HuggingFace API
-    data = {
-        'inputs': f"You: {user_input}\nAI:",  # Sending user input as part of the prompt
-        'parameters': {
-            'max_length': 100,
-            'temperature': 0.7,
-            'top_p': 0.95
-        }
-    }
+    # ⚠️ Limit chat history to avoid context overflow (only last 10 interactions)
+    history_for_api = session['history'][-10:]  # Only keep the last 10 exchanges
 
-    try:
-        # Send the request to HuggingFace API
-        response = requests.post(API_URL, headers=HEADERS, json=data)
-        response.raise_for_status()
+    intro_message = (
+        "The following is a conversation with an AI assistant.\n"
+        "The assistant is helpful, creative, clever, and concise.\n"
+    )
 
-        # Extract response text from the API
-        response_json = response.json()
-        if isinstance(response_json, list) and len(response_json) > 0:
-            ai_response = response_json[0].get('generated_text', 'No response')
-            # Optionally, split off the prompt part if it's included in the response
-            ai_response = ai_response.split('AI:')[-1].strip()  # Extract everything after "AI:"
-        else:
-            ai_response = 'No valid response received'
-    
-    except Exception as e:
-        ai_response = f"Error: {str(e)}"
-    
-    # Add AI response to the session history
-    session['history'].append({'role': 'assistant', 'message': ai_response})
-    session.modified = True  # Ensure session changes are saved
-    
-    return jsonify({'message': ai_response})
+    # ⚠️ Enhanced prompt structure for clarity
+    prompt = intro_message + "\n".join(
+        [f"{msg['role'].capitalize()}: {msg['message']}" for msg in history_for_api]
+    ) + "\nAssistant:"
+
+    logging.debug(f"Prompt sent to model: {prompt}")
+
+    # Return a streaming response
+    return Response(stream_response(prompt), content_type='text/event-stream')
 
 @app.route('/clear', methods=['POST'])
-def clear_history():
+def clear():
     """Clear the chat history."""
-    session.pop('history', None)
-    return jsonify({'success': True})
+    session.pop('history', None)  # Clear chat history from the session
+    return jsonify({'message': 'Chat history cleared'}), 200
+
+def stream_response(prompt, max_loops=10):
+    """Stream the AI's response in real-time using SSE."""
+    for i in range(max_loops):
+        try:
+            data = {
+                'inputs': prompt, 
+                'parameters': {
+                    'max_length': 500,  # Generate 500 tokens at a time
+                    'temperature': 0.7, 
+                    'top_p': 0.95
+                }
+            }
+
+            logging.info(f"Sending request (loop {i+1})...")
+            response = send_request_with_retries(data)
+            response_json = response.json()
+
+            if isinstance(response_json, list) and len(response_json) > 0:
+                chunk = response_json[0].get('generated_text', '')
+                if 'Assistant:' in chunk:
+                    chunk = chunk.split('Assistant:')[-1].strip()
+                
+                logging.debug(f"Received chunk: {chunk}")
+
+                yield f"data: {chunk}\n\n"  # Send the chunk to the client
+                
+                # ⚠️ Stop the stream when one of the "end" triggers is detected
+                if chunk.endswith(('.', '!', '?')) or "The End" in chunk:
+                    logging.info("AI finished response.")
+                    break
+
+                prompt = prompt + chunk + "\nAssistant:"
+            else:
+                logging.warning("No valid response received.")
+                break
+
+        except Exception as e:
+            logging.error(f"Error during generation loop {i+1}: {str(e)}")
+            break
+
+def send_request_with_retries(data, retries=3):
+    """Send a request to the HuggingFace API with retry logic."""
+    for attempt in range(retries):
+        try:
+            response = requests.post(API_URL, headers=HEADERS, json=data, timeout=60)
+            response.raise_for_status()
+            return response
+        except requests.exceptions.HTTPError as http_err:
+            logging.error(f"HTTP error occurred: {http_err}")
+            if response.status_code == 429:  # Too Many Requests
+                time.sleep(2 ** attempt)  # Exponential backoff
+        except requests.exceptions.RequestException as req_err:
+            logging.error(f"Request error occurred: {req_err}")
+        except Exception as e:
+            logging.error(f"Unexpected error: {str(e)}")
+    raise Exception("All attempts to contact the Qwen API have failed.")
 
 if __name__ == '__main__':
     app.run(debug=True)
