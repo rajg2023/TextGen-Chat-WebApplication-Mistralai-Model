@@ -1,8 +1,8 @@
 /* General Styles */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #121212;
-    color: #fff;
+    background-color: #f4f7f6;
+    color: #333;
     margin: 0;
     height: 100vh;
     display: flex;
@@ -12,104 +12,104 @@ body {
 
 .chat-app {
     width: 100%;
-    max-width: 500px;
+    max-width: 600px;
     height: 90vh;
     display: flex;
     flex-direction: column;
-    border-radius: 10px;
+    border-radius: 8px;
     overflow: hidden;
-    background-color: #1f1f1f;
+    background-color: #fff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 header {
-    background-color: #202020;
-    padding: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    background-color: #007bff;
+    padding: 20px;
+    text-align: center;
+    color: #fff;
+    font-size: 24px;
+    font-weight: bold;
 }
 
 .chat-container {
     flex: 1;
     padding: 20px;
     overflow-y: auto;
-    scroll-behavior: smooth;  /* Smooth scrolling */
+    background-color: #f9f9f9;
+    border-bottom: 1px solid #eee;
+    scroll-behavior: smooth;
 }
 
 .message {
     display: flex;
-    margin-bottom: 15px;  /* Adjusted spacing */
-    padding: 5px 0;
+    margin-bottom: 20px;
 }
 
 .message.user .bubble {
     background-color: #007bff;
     color: white;
     align-self: flex-start;
+    max-width: 75%;
 }
 
 .message.assistant .bubble {
     background-color: #444;
     color: white;
     align-self: flex-end;
+    max-width: 75%;
 }
 
 .bubble {
-    padding: 10px 15px;
-    border-radius: 8px;
-    color: #fff;
-    max-width: 80%;  /* Adjusted from 70% */
-}
-
-/* Code block styling */
-pre {
-    background-color: #2c2c2c;
-    padding: 20px;
-    border-radius: 8px;
-    font-size: 14px;
-    color: #fff;
-    margin-top: 10px;
-    white-space: pre-wrap;
+    padding: 12px 18px;
+    border-radius: 15px;
+    font-size: 16px;
+    line-height: 1.5;
     word-wrap: break-word;
-}
-
-code {
-    font-family: 'Courier New', monospace;
 }
 
 form {
     display: flex;
-    padding: 10px;
-    background-color: #202020;
+    padding: 15px;
+    background-color: #f4f7f6;
+    border-top: 1px solid #eee;
+    align-items: center;
+    gap: 10px; /* Add space between elements */
 }
 
 textarea {
     flex: 1;
-    border: none;
-    padding: 10px;
-    border-radius: 5px;
+    border: 1px solid #ddd;
+    padding: 12px;
+    border-radius: 8px;
     resize: none;
-    color: #fff;
-    background-color: #2c2c2c;
+    color: #333;
+    font-size: 16px;
 }
 
 textarea:focus {
     outline: none;
     border: 2px solid #007bff;
-    background-color: #333;
 }
 
-button.send-btn {
+button.send-btn, button.clear-btn {
     background-color: #007bff;
     border: none;
     color: white;
-    padding: 10px 20px;
-    border-radius: 5px;
+    padding: 12px 20px;
+    border-radius: 8px;
     cursor: pointer;
 }
 
-button.send-btn:hover {
+button.send-btn:hover, button.clear-btn:hover {
     background-color: #0056b3;
+}
+
+button.clear-btn {
+    background-color: #ff4c4c;
+}
+
+button.clear-btn:hover {
+    background-color: #e03e3e;
 }
 
 /* Custom Scrollbar */
@@ -118,24 +118,38 @@ button.send-btn:hover {
 }
 
 .chat-container::-webkit-scrollbar-thumb {
-    background-color: #444;
+    background-color: #888;
     border-radius: 4px;
 }
 
 .chat-container::-webkit-scrollbar-track {
-    background: #333;
+    background: #f4f7f6;
 }
 
-/* Clear Button */
-.clear-btn {
-    background-color: #ff4c4c;
-    color: white;
-    padding: 5px 15px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
+/* Typing Indicator */
+.typing-indicator {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    color: #888;
 }
 
-.clear-btn:hover {
-    background-color: #e03e3e;
+.typing-indicator::before {
+    content: '';
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    margin-right: 5px;
+    background-color: #888;
+    border-radius: 50%;
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0;
+    }
 }
