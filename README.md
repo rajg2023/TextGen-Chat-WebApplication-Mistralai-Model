@@ -61,6 +61,6 @@ QwenCoderApp/
 ├── app.py
 ├── app.log
 ├── requirements.txt
-└── README.md## Contributing
+└── README.md
 
 
