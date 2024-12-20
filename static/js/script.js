@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const form = document.getElementById('chat-form');
+    const form = document.getElementById('prompt-form');
     const chatContainer = document.getElementById('chat-container');
     const promptInput = document.getElementById('prompt');
 

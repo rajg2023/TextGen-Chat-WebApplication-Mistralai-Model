@@ -32,10 +32,22 @@ logging.basicConfig(level=logging.DEBUG,
 
 @app.route('/')
 def index():
-    """Render the chat UI and load chat history from the session."""
-    if 'history' not in session:
-        session['history'] = []
-    return render_template('chat.html', history=session['history'])
+    history = session.get('history', [])
+    ai_response = session.get('ai_response', '')
+    return render_template('chat.html', history=history, ai_response=ai_response)
+
+@app.route('/api/inference', methods=['POST'])
+def inference():
+    data = request.json
+    try:
+        response = requests.post(API_URL, headers=HEADERS, json=data)
+        response.raise_for_status()  # Raise an HTTPError for bad responses
+        result = response.json()
+        session['ai_response'] = result  # Store the AI response in the session
+        return jsonify(result)
+    except requests.exceptions.RequestException as e:
+        logging.error(f"API request failed: {e}")
+        return jsonify({"error": "API request failed"}), 500
 
 @app.route('/get_response', methods=['POST'])
 def get_response():

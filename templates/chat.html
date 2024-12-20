@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat with Assistant</title>
+    <title>Flask Chat App</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
@@ -19,13 +19,12 @@
                 </div>
             {% endfor %}
         </div>
-        <form id="chat-form">
-            <textarea id="prompt" placeholder="Type a message..."></textarea>
-            
-        </form>
-        <form id="chat-form">
-            
-            <button type="button" class="clear-btn" id="clear-chat">Clear Chat</button> 
+        <form id="prompt-form">
+            <textarea name="prompt" id="prompt" rows="4" cols="50" placeholder="Type your message here..."></textarea>
+            <div class="button-container">
+                <button type="submit" class="send-btn">Send</button>
+                <button type="button" class="clear-btn" id="clear-chat">Clear</button>
+            </div>
         </form>
     </div>
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
