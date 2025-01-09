@@ -1,6 +1,6 @@
-# QwenCoderApp - (WIP)
+# Mistralai/Mixtral-8x7B-Instruct-v0.1 AI Web App - (WIP)
 
-QwenCoderApp is a web-based chat application that allows users to interact with an AI assistant powered by the HuggingFace API. Built with Flask for the backend and vanilla JavaScript for the frontend, the app offers an interactive chat interface, typing indicators, session management, and more.
+This is a web-based chat application that allows users to interact with an AI assistant powered by the HuggingFace API. Built with Flask for the backend and vanilla JavaScript for the frontend, the app offers an interactive chat interface, typing indicators, session management, and more.
 
 ## Features
 
@@ -15,7 +15,7 @@ QwenCoderApp is a web-based chat application that allows users to interact with 
 1. Clone the repository:
     ```sh
     git clone <repository-url>
-    cd QwenCoderApp
+    cd <AIChatAppname>
     ```
 
 2. Create and activate a virtual environment:
@@ -48,6 +48,6 @@ QwenCoderApp is a web-based chat application that allows users to interact with 
 
 ## Project Structure
 
-<p>QwenCoderApp/<br>├── static/<br>│   ├── css/<br>│   │   └── style.css<br>│   └── js/<br>│       └── script.js<br>├── templates/<br>│   ├── chat.html<br>│   └── error.html<br>├── .env<br>├── app.py<br>├── app.log<br>├── requirements.txt<br>└── README.md</p>
+<p>AIChatApp/<br>├── static/<br>│   ├── css/<br>│   │   └── style.css<br>│   └── js/<br>│       └── script.js<br>├── templates/<br>│   ├── chat.html<br>│   └── error.html<br>├── .env<br>├── app.py<br>├── app.log<br>├── requirements.txt<br>└── README.md</p>
 
 
