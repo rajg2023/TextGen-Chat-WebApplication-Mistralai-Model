@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from flask import Flask, request, render_template, session, jsonify
 import requests
 import logging
-import time
+import json
 
 # Load environment variables from .env
 load_dotenv()
@@ -17,7 +17,7 @@ app.secret_key = os.getenv('SECRET_KEY', secrets.token_hex(32))
 
 # Load HuggingFace API token from .env
 API_TOKEN = os.getenv('HUGGINGFACE_API_TOKEN')
-API_URL = 'https://api-inference.huggingface.co/models/Qwen/Qwen2.5-Coder-32B-Instruct'
+API_URL = 'https://api-inference.huggingface.co/models/mistralai/Mixtral-8x7B-Instruct-v0.1'
 
 HEADERS = {
     'Authorization': f'Bearer {API_TOKEN}',
@@ -30,11 +30,31 @@ logging.basicConfig(level=logging.DEBUG,
                     handlers=[logging.FileHandler("app.log"),
                               logging.StreamHandler()])
 
+HISTORY_FILE = "chat_history.json"
+
+def load_chat_history():
+    """Load chat history from a file."""
+    if os.path.exists(HISTORY_FILE):
+        with open(HISTORY_FILE, "r") as file:
+            return json.load(file)
+    return []
+
+def save_chat_history(history):
+    """Save chat history to a file."""
+    with open(HISTORY_FILE, "w") as file:
+        json.dump(history, file)
+
 @app.route('/')
 def index():
-    history = session.get('history', [])
-    ai_response = session.get('ai_response', '')
-    return render_template('chat.html', history=history, ai_response=ai_response)
+    if 'initialized' not in session:
+        # Start with an initial message and set the initialized flag
+        session['history'] = [{'role': 'assistant', 'message': 'Hello! How can I assist you today?'}]
+        session['initialized'] = True
+        save_chat_history(session['history'])
+    else:
+        session['history'] = load_chat_history()
+
+    return render_template('chat.html', history=session['history'])
 
 @app.route('/api/inference', methods=['POST'])
 def inference():
@@ -76,6 +96,7 @@ def get_response():
 
     # Add AI response to the session history
     session['history'].append({'role': 'assistant', 'message': ai_response})
+    save_chat_history(session['history'])  # Save the chat history to file
     session.modified = True  # Ensure session changes are saved
 
     return jsonify({'message': ai_response})
@@ -146,6 +167,16 @@ def get_ai_response(prompt):
 def clear_chat():
     """Clear chat history."""
     session['history'] = []
+    save_chat_history([])  # Clear the chat history file
+    session.modified = True  # Ensure session changes are saved
+    return jsonify({'status': 'success'})
+
+@app.route('/save_history', methods=['POST'])
+def save_history():
+    """Save the chat history to a file."""
+    data = request.json
+    history = data.get('history', [])
+    save_chat_history(history)
     return jsonify({'status': 'success'})
 
 if __name__ == '__main__':

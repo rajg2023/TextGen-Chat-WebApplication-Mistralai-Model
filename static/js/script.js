@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let interval = setInterval(() => {
             messageElement.innerHTML += message[index];
             index++;
+            scrollToBottom(); // Scroll to the bottom after each character is added
             if (index === message.length) {
                 clearInterval(interval); // Stop typing when the message is complete
             }
@@ -53,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 typeMessage(aiMessageElement, data.message);
             }
 
-            // Save chat history to session storage
+            // Save chat history to the server
             saveChatHistory();
         } catch (error) {
             console.error('Error fetching AI response:', error);
@@ -67,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
         messageElement.classList.add('message', role);
         messageElement.innerHTML = `<div class="bubble">${message}</div>`;
         chatContainer.appendChild(messageElement);
-        chatContainer.scrollTop = chatContainer.scrollHeight;
+        scrollToBottom(); // Scroll to the bottom when a new message is added
     }
 
     // Clear chat history event listener
@@ -86,25 +87,42 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Load chat history on page load
-    window.addEventListener('load', () => {
-        // Clear chat container before loading the chat history
-        chatContainer.innerHTML = '';
-        // Load the chat history from session storage only if it exists and is not empty
-        const chatHistory = JSON.parse(sessionStorage.getItem('chatHistory')) || [];
-        chatHistory.forEach(message => {
-            addMessage(message.role, message.message);
-        });
+    window.addEventListener('load', async () => {
+        try {
+            const response = await fetch('/');
+            const data = await response.json();
+            const chatHistory = data.history || [];
+            chatContainer.innerHTML = ''; // Clear chat container before loading the chat history
+            chatHistory.forEach(message => {
+                addMessage(message.role, message.message);
+            });
+            // Save initial history to session storage
+            sessionStorage.setItem('chatHistory', JSON.stringify(chatHistory));
+        } catch (error) {
+            console.error('Error loading chat history:', error);
+        }
     });
 
-    // Save chat history to session storage
-    function saveChatHistory() {
+    // Save chat history to the server
+    async function saveChatHistory() {
         const messages = Array.from(chatContainer.getElementsByClassName('message')).map(messageElement => {
             const role = messageElement.classList.contains('user') ? 'user' : 'assistant';
             const messageElementBubble = messageElement.querySelector('.bubble');
             const message = messageElementBubble ? messageElementBubble.textContent : '';
             return { role, message };
         });
-        sessionStorage.setItem('chatHistory', JSON.stringify(messages));
+
+        try {
+            await fetch('/save_history', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ history: messages })
+            });
+            // Save history to session storage as well
+            sessionStorage.setItem('chatHistory', JSON.stringify(messages));
+        } catch (error) {
+            console.error('Error saving chat history:', error);
+        }
     }
 
     // Function to show typing indicator
@@ -113,7 +131,7 @@ document.addEventListener('DOMContentLoaded', () => {
         typingIndicator.classList.add('typing-indicator');
         typingIndicator.innerHTML = 'Assistant is typing...';
         chatContainer.appendChild(typingIndicator);
-        chatContainer.scrollTop = chatContainer.scrollHeight;
+        scrollToBottom(); // Scroll to the bottom when typing indicator is shown
     }
 
     // Function to remove typing indicator
@@ -122,5 +140,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (typingIndicator) {
             chatContainer.removeChild(typingIndicator);
         }
+    }
+
+    // Function to scroll to the bottom of the chat container
+    function scrollToBottom() {
+        chatContainer.scrollTop = chatContainer.scrollHeight;
     }
 });
