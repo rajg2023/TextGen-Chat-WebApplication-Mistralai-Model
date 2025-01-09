@@ -1,13 +1,15 @@
 # Mistralai/Mixtral-8x7B-Instruct-v0.1 ChatAI Web App - (WIP)
 
-This is a web-based chat application that allows users to interact with an AI assistant powered by the HuggingFace API. Built with Flask for the backend and vanilla JavaScript for the frontend, the app offers an interactive chat interface, typing indicators, session management, and more.
+This web-based chat application enables users to engage with an AI assistant, leveraging the HuggingFace API for advanced conversational capabilities. The application is meticulously engineered with Flask serving as the backend framework, ensuring robust server-side operations, while the frontend is crafted with HTML and JavaScript, delivering a seamless and interactive user experience.
+
+#**Please note that this is a test application. While it showcases the potential of AI-driven interactions, it may not always provide accurate information and may occasionally generate responses that are not based on factual data, a phenomenon known as "hallucination." Users are advised to proceed with caution and independently verify critical information.
 
 ## Features
 
-- **Interactive Chat Interface**: Users can type messages and receive AI-generated responses.
-- **Typing Indicator**: Displays when the AI assistant is typing.
+- **Interactive Chat Interface**: A user-friendly interface that facilitates smooth and engaging conversations between users and the AI assistant.
+- **Typing Indicator**: Real-time indicators that display when the AI assistant is generating a response, enhancing the conversational flow.
 - **Clear Chat History**: Easily clear the chat history.
-- **Session Management**: Retains chat history across page reloads.
+- **Session Management**: fficient management of user sessions to maintain context and continuity throughout the interaction.
 - **Complete Response Handling**: Ensures long AI responses are complete.
 
 ## Installation
